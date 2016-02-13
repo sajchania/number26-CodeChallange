@@ -19,7 +19,49 @@ import com.number26.codechallange.main.Transaction;
  * 
  * @author Jacek Galewicz
  */
-public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTestBase {
+public class TransactionServiceOnTomcatTest extends
+		TransactionServiceOnTomcatTestBase {
+
+	@Test
+	public void simpleExampleFromCodeChallangeTest() {
+		// first example
+		Transaction transaction1 = new Transaction();
+		transaction1.setTransaction_id(10);
+		transaction1.setAmount(5000);
+		transaction1.setType("cars");
+
+		POST_TRANSACTION(transaction1);
+		String putExpectation = "PUT transactionservice/transaction/10\n=>{ \"status\": \"ok\" }";
+		String putMessage = PUT_TRANSACTION(transaction1);
+		Assert.assertEquals(putExpectation, putMessage);
+
+		// second example
+		Transaction transaction2 = new Transaction();
+		transaction2.setTransaction_id(11);
+		transaction2.setAmount(10000);
+		transaction2.setParent_id(10);
+		transaction2.setType("shopping");
+
+		POST_TRANSACTION(transaction2);
+		String putExpectation2 = "PUT transactionservice/transaction/11\n=>{ \"status\": \"ok\" }";
+		String putMessage2 = PUT_TRANSACTION(transaction2);
+		Assert.assertEquals(putExpectation2, putMessage2);
+
+		// third exammple
+		String getExpectation = "GET transactionservice/types/cars\n=> [ 10 ]";
+		String getMessage = GET_TYPE(transaction1);
+		Assert.assertEquals(getExpectation, getMessage);
+
+		// fourth exammple
+		String getExpectation2 = "GET transactionservice/sum/10\n=> { \"sum \": 15000.0 }";
+		String getMessage2 = GET_SUM(transaction1);
+		Assert.assertEquals(getExpectation2, getMessage2);
+
+		// fifth exammple
+		String getExpectation3 = "GET transactionservice/sum/11\n=> { \"sum \": 10000.0 }";
+		String getMessage3 = GET_SUM(transaction2);
+		Assert.assertEquals(getExpectation3, getMessage3);
+	}
 
 	@Test
 	public void simplePostGetTest() {
@@ -36,7 +78,7 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		Assert.assertEquals(postExpectation, postMessage);
 
 		String getExpectation = "GET transactionservice/transaction/98\n{ \"amount\": 1.0, \"type\": TYP1, \"parent_id\": 1 }\n=>{ \"status\": \"ok\" }";
-		String getMessage = GET_TRANSACTION(transaction_id);
+		String getMessage = GET_TRANSACTION(transaction1);
 		Assert.assertEquals(getExpectation, getMessage);
 	}
 
@@ -63,7 +105,7 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		Assert.assertEquals(putExpectation, putMessage);
 
 		String getExpectation = "GET transactionservice/transaction/98\n{ \"amount\": 2.0, \"type\": TYP20, \"parent_id\": 10 }\n=>{ \"status\": \"ok\" }";
-		String getMessage = GET_TRANSACTION(transaction_id);
+		String getMessage = GET_TRANSACTION(transaction1);
 		Assert.assertEquals(getExpectation, getMessage);
 	}
 
@@ -81,7 +123,7 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		Assert.assertEquals(postExpectation, postMessage);
 
 		String getExpectation = "GET transactionservice/transaction/98\n{ \"amount\": 1.0, \"type\": TYP1 }\n=>{ \"status\": \"ok\" }";
-		String getMessage = GET_TRANSACTION(transaction_id);
+		String getMessage = GET_TRANSACTION(transaction1);
 		Assert.assertEquals(getExpectation, getMessage);
 	}
 
@@ -160,10 +202,17 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		String postMessage = POST_TRANSACTION(transaction1);
 		Assert.assertEquals(postExpectation, postMessage);
 
+		String transaction_id2 = "99";
+		Transaction unknown_transaction = new Transaction();
+		unknown_transaction.setTransaction_id(Long.parseLong(transaction_id2));
+		unknown_transaction.setAmount(1.0);
+		unknown_transaction.setParent_id(1);
+		unknown_transaction.setType("TYP1");
+
 		// In tomcat console we can see the message:
 		// "SEVERE: Transaction with an id: 99 was not found" as expected
 		String getExpectation = "GET transactionservice/transaction/99\n{ }";
-		String getMessage = GET_TRANSACTION("99");
+		String getMessage = GET_TRANSACTION(unknown_transaction);
 		Assert.assertEquals(getExpectation, getMessage);
 	}
 
@@ -204,7 +253,7 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		Assert.assertEquals(postExpectation3, postMessage3);
 
 		String typeExpectation1 = "GET transactionservice/types/TYP1\n=> [ 98, 99, 100 ]";
-		String typeMessage1 = GET_TYPE("TYP1");
+		String typeMessage1 = GET_TYPE(transaction1);
 		Assert.assertEquals(typeExpectation1, typeMessage1);
 
 	}
@@ -245,8 +294,15 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		String postMessage3 = POST_TRANSACTION(transaction3);
 		Assert.assertEquals(postExpectation3, postMessage3);
 
+		String transaction_id4 = "100";
+		Transaction unknown_transaction = new Transaction();
+		unknown_transaction.setTransaction_id(Long.parseLong(transaction_id4));
+		unknown_transaction.setAmount(2.0);
+		unknown_transaction.setParent_id(3);
+		unknown_transaction.setType("TYP4");
+
 		String typeExpectation1 = "GET transactionservice/types/TYP4\n=> [  ]";
-		String typeMessage1 = GET_TYPE("TYP4");
+		String typeMessage1 = GET_TYPE(unknown_transaction);
 		Assert.assertEquals(typeExpectation1, typeMessage1);
 
 	}
@@ -290,7 +346,7 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		// In tomcat console we can see the message:
 		// "SEVERE: There are no transactions with the type: TYP4." as expected
 		String sumExpectation1 = "GET transactionservice/sum/98\n=> { \"sum \": 8.0 }";
-		String sumMessage1 = GET_SUM(transaction_id);
+		String sumMessage1 = GET_SUM(transaction1);
 		Assert.assertEquals(sumExpectation1, sumMessage1);
 	}
 
@@ -309,7 +365,7 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		Assert.assertEquals(postExpectation, postMessage);
 
 		String sumExpectation1 = "GET transactionservice/sum/98\n=> { \"sum \": 1.0 }";
-		String sumMessage1 = GET_SUM(transaction_id);
+		String sumMessage1 = GET_SUM(transaction1);
 		Assert.assertEquals(sumExpectation1, sumMessage1);
 	}
 
@@ -317,6 +373,11 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 	public void noParentSumTest() {
 
 		String transaction_id = "98";
+		Transaction unknown_transaction = new Transaction();
+		unknown_transaction.setTransaction_id(Long.parseLong(transaction_id));
+		unknown_transaction.setAmount(2.0);
+		unknown_transaction.setParent_id(Long.parseLong(transaction_id));
+		unknown_transaction.setType("TYP2");
 
 		String transaction_id2 = "99";
 		Transaction transaction2 = new Transaction();
@@ -343,7 +404,7 @@ public class TransactionServiceOnTomcatTest extends TransactionServiceOnTomcatTe
 		// In tomcat console we can see the message:
 		// "SEVERE: There is no transaction with transactionId 98." as expected
 		String sumExpectation1 = "GET transactionservice/sum/98\n=> { \"sum \":  }";
-		String sumMessage1 = GET_SUM(transaction_id);
+		String sumMessage1 = GET_SUM(unknown_transaction);
 		Assert.assertEquals(sumExpectation1, sumMessage1);
 	}
 

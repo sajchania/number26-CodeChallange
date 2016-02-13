@@ -18,8 +18,8 @@ import com.number26.codechallange.main.TransactionService;
  */
 public class TransactionServiceTest {
 	private TransactionService t = new TransactionService();
-	HashMap<Long, Transaction> transactions = new HashMap<Long, Transaction>();
-	Transaction result = new Transaction();
+	private HashMap<Long, Transaction> transactions = new HashMap<Long, Transaction>();
+	private Transaction result = new Transaction();
 
 	@Before
 	public void setup() {

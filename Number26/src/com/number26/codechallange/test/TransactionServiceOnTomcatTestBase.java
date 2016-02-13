@@ -14,7 +14,8 @@ import com.sun.jersey.api.client.WebResource;
 public class TransactionServiceOnTomcatTestBase {
 
 	public static final Logger logger = Logger
-			.getLogger(TransactionServiceOnTomcatTestBase.class.getCanonicalName());
+			.getLogger(TransactionServiceOnTomcatTestBase.class
+					.getCanonicalName());
 	public static final String SIMPLE_URI = "http://localhost:8080/Number26/codechallange/transactionservice/transaction";
 	public static final String TYPE_URI = "http://localhost:8080/Number26/codechallange/transactionservice/types";
 	public static final String SUM_URI = "http://localhost:8080/Number26/codechallange/transactionservice/sum";
@@ -72,8 +73,10 @@ public class TransactionServiceOnTomcatTestBase {
 	}
 
 	@Ignore
-	protected static String GET_TRANSACTION(String transaction_id) {
+	protected static String GET_TRANSACTION(Transaction transaction) {
 		String message = "";
+		String transaction_id = ((Long) transaction.getTransaction_id())
+				.toString();
 
 		WebResource webResource = client.resource(SIMPLE_URI);
 		ClientResponse response = webResource.path(transaction_id)
@@ -110,8 +113,9 @@ public class TransactionServiceOnTomcatTestBase {
 	}
 
 	@Ignore
-	protected static String GET_TYPE(String type) {
+	protected static String GET_TYPE(Transaction transaction) {
 		String message = "";
+		String type = transaction.getType();
 
 		WebResource webResource = client.resource(TYPE_URI);
 		ClientResponse response = webResource.path(type)
@@ -129,8 +133,10 @@ public class TransactionServiceOnTomcatTestBase {
 	}
 
 	@Ignore
-	protected static String GET_SUM(String transaction_id) {
+	protected static String GET_SUM(Transaction transaction) {
 		String message = "";
+		String transaction_id = ((Long) transaction.getTransaction_id())
+				.toString();
 
 		WebResource webResource = client.resource(SUM_URI);
 		ClientResponse response = webResource.path(transaction_id)
